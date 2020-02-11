@@ -1,0 +1,19 @@
+---
+- hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: Ensure .ssh path
+      file:
+        path: ~/.ssh
+        state: directory
+    # https://docs.ansible.com/ansible/latest/modules/openssh_keypair_module.html
+    - name: Generate ssh key for pi
+      openssh_keypair:
+        path: ~/.ssh/id_ssh_ed25519_pi
+        type: ed25519
+    - name: ssh-agent
+      shell: eval `ssh-agent`
+    # https://stackoverflow.com/questions/31969546/execute-ssh-add-with-ansible-raise-an-error
+    - name: Add the key
+      shell: ssh-add ~/.ssh/id_ssh_ed25519_pi
