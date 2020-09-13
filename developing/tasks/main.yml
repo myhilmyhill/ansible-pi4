@@ -1,0 +1,51 @@
+---
+
+- name: Install developing tools
+  become: yes
+  apt:
+    name:
+      - git
+      - wget
+      - curl
+    update_cache: yes
+
+# Docker
+# https://yasha.solutions/install-docker-on-debian-with-ansible/
+
+- name: Set up the repository
+  become: yes
+  apt:
+    name:
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - gnupg-agent
+      - software-properties-common
+    update_cache: yes
+
+- name: Add Apt signing key from official docker repo
+  become: yes
+  apt_key:
+    url: https://download.docker.com/linux/debian/gpg
+    state: present
+
+- name: add docker official repository for Debian
+  become: yes
+  apt_repository:
+    repo: deb [arch=amd64] https://download.docker.com/linux/debian buster stable
+    state: present
+
+- name: Install docker engine
+  apt:
+    name:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+    update_cache: yes
+
+- name: Ensure docker-compose is installed and available
+  get_url:
+    url: https://github.com/docker/compose/releases/download/1.22.0/docker-compose-{{ ansible_system }}-{{ ansible_userspace_architecture }}
+    dest: /usr/local/bin/docker-compose
+    mode: 'u+x,g+x'
+
